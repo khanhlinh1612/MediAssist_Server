@@ -2,9 +2,11 @@
   "name": "mediassistserver",
   "version": "1.0.0",
   "description": "Server of MediAssist Application",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "nodemon --inspect index.js",
+    "beautify": "lint-staged",
+    "start": "nodemon --inspect src/index.js",
+    "watch": "node-sass --watch src/resources/scss --output src/public/css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,8 +25,25 @@
     "url": "https://github.com/khanhlinh1612/MediAssist_Server/issues"
   },
   "homepage": "https://github.com/khanhlinh1612/MediAssist_Server#readme",
+  "lint-staged": {
+    "src/**/*{js,json,scss}":"prettier --single-quote --trailing-comma all --tab-width 4 --write 'src/**/*{js,json,scss}'"
+  },
+  "husky":{
+      "hooks":{
+          "pre-commit": "lint-staged"
+      }
+  }
+  ,
   "dependencies": {
     "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
     "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "morgan": "^1.10.0",
+    "node-sass": "^9.0.0",
+    "prettier": "^3.2.5"
   }
 }
