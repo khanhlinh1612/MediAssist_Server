@@ -26,14 +26,13 @@
   },
   "homepage": "https://github.com/khanhlinh1612/MediAssist_Server#readme",
   "lint-staged": {
-    "src/**/*{js,json,scss}":"prettier --single-quote --trailing-comma all --tab-width 4 --write 'src/**/*{js,json,scss}'"
+    "src/**/*{js,json,scss}": "prettier --single-quote --trailing-comma all --tab-width 4 --write 'src/**/*{js,json,scss}'"
   },
-  "husky":{
-      "hooks":{
-          "pre-commit": "lint-staged"
-      }
-  }
-  ,
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "dependencies": {
     "express": "^4.18.2",
     "express-handlebars": "^7.1.2",
