@@ -5,20 +5,33 @@ const morgan = require('morgan');
 const handlebars = require('express-handlebars');
 const app = express();
 const route = require('./routes');
-const port = 3000;
+const db = require('./config');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const port = 4000;
+const corsOptions = {
+    origin: 'http://localhost:3000', // Thay đổi thành nguồn gốc của ứng dụng frontend của bạn
+    credentials: true, // Cho phép sử dụng cookie và xác thực HTTP
+};
 
+// Connect to DB
+db.connect();
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", 'cdn.jsdelivr.net'],
             scriptSrc: ["'self'", 'cdn.jsdelivr.net'],
+            imgSrc: ["'self'", 'https:', 'http:', 'data:'],
         },
     }),
 );
 //Config Static File
 app.use(express.static(path.join(__dirname, 'public')));
-console.log(path.join(__dirname, 'public'));
+app.use('/uploads', express.static(path.join(__dirname, '..', '/uploads')));
 
 //HTTP logger
 // app.use(morgan('combined'));
@@ -40,23 +53,10 @@ app.engine(
     }),
 );
 app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'resources\\views'));
-console.log('PATH:', path.join(__dirname, 'resources\\views'));
+app.set('views', path.join(__dirname, 'resources', 'views'));
 
+//Routes init
 route(app);
-app.get('/', (req, res) => {
-    return res.render('home');
-});
-app.get('/news', (req, res) => {
-    return res.render('news');
-});
-app.get('/search', (req, res) => {
-    return res.render('search');
-});
-app.post('/search', (req, res) => {
-    console.log(req.body);
-    res.send('');
-});
 
 app.listen(port, () =>
     console.log(`Listening on port http://localhost: ${port}`),

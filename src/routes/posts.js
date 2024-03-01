@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const uploadMiddleware = multer({ dest: 'uploads/' });
+const postsController = require('../app/controllers/PostsController');
+router.get('/:slug', postsController.show);
+router.put('/:slug', postsController.update);
+router.delete('/:slug', postsController.delete);
+router.get('/', postsController.index);
+router.post('/', uploadMiddleware.single('file'), postsController.create);
+module.exports = router;
