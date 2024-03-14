@@ -65,8 +65,8 @@ class PostsController {
 
     //  [GET] /posts/:id :get a specific post
     show(req, res, next) {
-        // Post.findOne({ slug: req.params.slug })
-        Post.findOne({ id: req.params.id })
+        // Post.findOne({ slug: req.params.slug }
+        Post.findById(req.params.id)
             .populate('author', ['first_name', 'last_name'])
             .then((post) => {
                 res.json(post);
@@ -76,7 +76,43 @@ class PostsController {
 
     // [PUT] /posts/:slug : update a specific post
     update(req, res, next) {
-        return res.json('updated');
+        let newPath = null;
+        if (req.file) {
+            const { originalname, path } = req.file;
+            const parts = originalname.split('.');
+            const ext = parts[parts.length - 1];
+            newPath = path + '.' + ext;
+            fs.renameSync(path, newPath);
+        }
+
+        // Get ID of author
+        const { token } = req.cookies;
+        if (token !== undefined && token !== '') {
+            jwt.verify(token, secret, {}, async (err, userInfo) => {
+                if (err) {
+                    console.error('Error verifying token:', err);
+                    return res.status(401).json({ error: 'Unauthorized' });
+                } else {
+                    const { id, title, summary, content } = req.body;
+                    const postDoc = await Post.findById(id);
+                    const isAuthor =
+                        JSON.stringify(userInfo.id) ==
+                        JSON.stringify(postDoc.author);
+                    if (!isAuthor) {
+                        return res
+                            .status(400)
+                            .json('You are not the author of this');
+                    }
+                    await Post.findByIdAndUpdate(id, {
+                        title,
+                        summary,
+                        content,
+                        cover: newPath ? newPath : postDoc.cover,
+                    });
+                    res.json(postDoc);
+                }
+            });
+        }
     }
 
     // [DELETE] /posts/:slug :delete a specific post
