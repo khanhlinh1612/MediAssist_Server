@@ -1,0 +1,77 @@
+[
+    {
+        "name": "X-quang",
+        "description": "Kiểm tra bằng tia X",
+        "price": 100000
+    },
+    {
+        "name": "Siêu âm",
+        "description": "Kiểm tra bằng siêu âm",
+        "price": 150000
+    },
+    {
+        "name": "MRI",
+        "description": "Kiểm tra bằng MRI",
+        "price": 300000
+    },
+    {
+        "name": "Xét nghiệm máu",
+        "description": "Kiểm tra các chỉ số máu",
+        "price": 120000
+    },
+    {
+        "name": "Đo huyết áp",
+        "description": "Kiểm tra huyết áp của bệnh nhân",
+        "price": 50000
+    },
+    {
+        "name": "Đo điện tâm đồ",
+        "description": "Kiểm tra hoạt động điện của tim",
+        "price": 80000
+    },
+    {
+        "name": "Khám tổng quát",
+        "description": "Kiểm tra tổng quát sức khỏe của bệnh nhân",
+        "price": 150000
+    },
+    {
+        "name": "Khám nội khoa",
+        "description": "Kiểm tra sức khỏe nội tiết, hô hấp, tiêu hóa...",
+        "price": 180000
+    },
+    {
+        "name": "Khám mắt",
+        "description": "Kiểm tra sức khỏe của mắt, đo thị lực...",
+        "price": 100000
+    },
+    {
+        "name": "Điều trị ngoại trú",
+        "description": "Dịch vụ điều trị bệnh tại phòng khám ngoại trú",
+        "price": 250000
+    },
+    {
+        "name": "Khám phụ khoa",
+        "description": "Kiểm tra sức khỏe phụ khoa của phụ nữ",
+        "price": 180000
+    },
+    {
+        "name": "Xét nghiệm máu",
+        "description": "Kiểm tra các chỉ số máu",
+        "price": 120000
+    },
+    {
+        "name": "Xét nghiệm nước tiểu",
+        "description": "Kiểm tra các chỉ số nước tiểu",
+        "price": 80000
+    },
+    {
+        "name": "Siêu âm thai",
+        "description": "Kiểm tra sức khỏe của thai nhi bằng siêu âm",
+        "price": 300000
+    },
+    {
+        "name": "Dinh dưỡng hỗ trợ",
+        "description": "Tư vấn và dinh dưỡng hỗ trợ cho bệnh nhân",
+        "price": 150000
+    }
+]

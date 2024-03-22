@@ -12,12 +12,17 @@ const UserSchema = new Schema({
     last_name: { type: String, default: '' },
     address: { type: String, default: '' },
     is_doctor: { type: Boolean, default: false },
-    idNumber: { type: String, default: '', unique: true },
+    idNumber: { type: String, default: '', unique: true }, // CCCD ID number
     avatar: {
         type: String,
         default:
             'https://mhchealthcare.org/wp-content/uploads/2019/05/doctor-avatar-1.jpg',
     },
+    // only doctor
+    experienced_year: { type: Number, default: 0 },
+    specialist: { type: String, default: '' },
+    // only Patient
+    histories: [{ type: Schema.Types.ObjectId, ref: 'History' }],
 });
 UserSchema.plugin(uniqueValidator);
 const User = mongoose.model('User', UserSchema);

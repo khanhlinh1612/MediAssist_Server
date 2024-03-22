@@ -10,14 +10,12 @@ class AppointmentController {
         if (Object.keys(req.query).length === 0) {
             events = await Appointment.find();
         } else {
-            console.log(req.query.start);
-            console.log(req.query.end);
             events = await Appointment.find({
                 start: { $gte: moment(req.query.start).toDate() },
                 end: { $lte: moment(req.query.end).toDate() },
             });
-            return res.json(events);
         }
+        return res.json(events);
     }
     // [GET] /appointments/:id : Get a appointments
     show(req, res, next) {}
@@ -56,6 +54,7 @@ class AppointmentController {
 
     //[DELETE] /appointments/:id : Delete
     delete(req, res, next) {
+        console.log(req.params.id);
         Appointment.findByIdAndDelete(req.params.id)
             .then((response) => {
                 console.log(response);
@@ -70,15 +69,20 @@ class AppointmentController {
 
     //[PUT] /appointments/:id   : Update an existing appointment
     update(req, res, next) {
-        console.log(req.body);
-        Appointment.findByIdAndUpdate(req.params.id, req.body, { new: true })
-            .then((updatedData) => {
-                console.log('This is updated data', updatedData);
-                res.json(updatedData);
+        if (req.params.id) {
+            Appointment.findByIdAndUpdate(req.params.id, req.body, {
+                new: true,
             })
-            .catch((err) => {
-                console.log(err);
-            });
+                .then((updatedData) => {
+                    console.log('This is updated data', updatedData);
+                    return res.json(updatedData);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
     }
 }
 
