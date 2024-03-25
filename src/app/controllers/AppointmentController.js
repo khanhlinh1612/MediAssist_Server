@@ -54,12 +54,9 @@ class AppointmentController {
 
     //[DELETE] /appointments/:id : Delete
     delete(req, res, next) {
-        console.log(req.params.id);
         Appointment.findByIdAndDelete(req.params.id)
             .then((response) => {
-                console.log(response);
                 res.json('success');
-                // res.json(response);
             })
             .catch((error) => {
                 console.error('Error creating event:', error);
@@ -74,7 +71,6 @@ class AppointmentController {
                 new: true,
             })
                 .then((updatedData) => {
-                    console.log('This is updated data', updatedData);
                     return res.json(updatedData);
                 })
                 .catch((err) => {

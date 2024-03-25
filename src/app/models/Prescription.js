@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const DrugSchema = new Schema({
-    medicine: { type: Schema.Types.ObjectId, ref: 'Medicine' },
+    name: { type: String },
     dosage: { type: String },
     quantity: { type: Number },
     price: { type: Number },
 });
-const PresciptionSchema = new Schema(
+const PrescriptionSchema = new Schema(
     {
         drugs: [DrugSchema],
         history: { type: Schema.Types.ObjectId, ref: 'History' },
@@ -15,5 +15,5 @@ const PresciptionSchema = new Schema(
     { timestamps: true },
 );
 
-const Presciption = mongoose.model('Presciption', PresciptionSchema);
-module.exports = Presciption;
+const Prescription = mongoose.model('Prescription', PrescriptionSchema);
+module.exports = Prescription;

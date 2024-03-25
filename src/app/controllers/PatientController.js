@@ -61,11 +61,10 @@ class PatientController {
 
     //[DELETE] /patients/:id : Delete
     delete(req, res, next) {
-        Appointment.findByIdAndDelete(req.params.id)
+        User.findByIdAndDelete(req.params.id)
             .then((response) => {
                 console.log(response);
                 res.json('success');
-                // res.json(response);
             })
             .catch((error) => {
                 console.error('Error creating event:', error);

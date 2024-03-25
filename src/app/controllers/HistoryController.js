@@ -17,6 +17,51 @@ const calTotal = (serviceArray, medicineArray) => {
     });
     return total;
 };
+//handle Medicines Array
+const handleMedicines = async (prescription) => {
+    let error = '';
+    let fixedPrescription = await Promise.all(
+        prescription.map(async (drug) => {
+            const medicine = await Medicine.findOne({
+                name: drug.name,
+            });
+            if (medicine) {
+                return {
+                    name: medicine.name,
+                    dosage: drug.dosage,
+                    quantity: drug.quantity,
+                    price: medicine.price,
+                };
+            } else {
+                error = 'Medicine is not available';
+            }
+        }),
+    );
+    return { fixedPrescription, error };
+};
+
+//handle Service Array
+const handleServices = async (services) => {
+    let errorService = '';
+    let medicalServices = await Promise.all(
+        services.map(async (service) => {
+            const serviceSystem = await MedicalService.findOne({
+                name: service.name,
+            });
+            if (serviceSystem) {
+                return {
+                    name: serviceSystem.name,
+                    price: serviceSystem.price,
+                    quantity: service.quantity,
+                };
+            } else {
+                errorService = 'Service is not available';
+            }
+        }),
+    );
+    return { medicalServices, errorService };
+};
+
 class HistoryController {
     // [GET] /history : Get all history
     async index(req, res, next) {
@@ -44,7 +89,27 @@ class HistoryController {
         }
     }
     // [GET] /history/:id : Get a history
-    show(req, res, next) {}
+    show(req, res, next) {
+        const historyId = req.params.id;
+        if (historyId) {
+            History.findById(historyId)
+                .populate('prescription', ['drugs'])
+                .populate('invoice', ['medicalServices', 'medicines'])
+                .then((data) => {
+                    if (data) {
+                        res.json(data);
+                    } else {
+                        res.status(404).json({ error: 'History not found' });
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                    res.status(500).json({ error: 'Internal Server Error' });
+                });
+        } else {
+            res.status(400).json({ error: 'Invalid historyId' });
+        }
+    }
 
     //[POST] /history : Create a new History
     async create(req, res, next) {
@@ -79,23 +144,9 @@ class HistoryController {
                 if (prescription.length === 0) {
                     prescription = [];
                 } else {
-                    prescription = await Promise.all(
-                        prescription.map(async (drug) => {
-                            const medicine = await Medicine.findOne({
-                                name: drug.name,
-                            });
-                            if (medicine) {
-                                return {
-                                    medicine: medicine._id,
-                                    dosage: drug.dosage,
-                                    quantity: drug.quantity,
-                                    price: medicine.price,
-                                };
-                            } else {
-                                error = 'Medicine is not available';
-                            }
-                        }),
-                    );
+                    const result = await handleMedicines(prescription);
+                    prescription = result.fixedPrescription;
+                    error = result.error;
                 }
             } else {
                 error = 'Invalid Prescription';
@@ -105,10 +156,6 @@ class HistoryController {
                 return res.status(500).json({ error });
             }
 
-            const createdPrescription = await Prescription.create({
-                drugs: prescription,
-            });
-
             // Tạo và lưu thực thể Service
             let medicalServices = req.body.service;
             let errorService = '';
@@ -116,43 +163,36 @@ class HistoryController {
                 if (medicalServices.length === 0) {
                     medicalServices = [];
                 } else {
-                    medicalServices = await Promise.all(
-                        medicalServices.map(async (service) => {
-                            const serviceSystem = await MedicalService.findOne({
-                                name: service.name,
-                            });
-                            if (serviceSystem) {
-                                return {
-                                    service: serviceSystem._id,
-                                    name: serviceSystem.name,
-                                    price: serviceSystem.price,
-                                };
-                            } else {
-                                errorService = 'Service is not available';
-                            }
-                        }),
-                    );
+                    const result = await handleServices(medicalServices);
+                    medicalServices = result.medicalServices;
+                    errorService = result.errorService;
                 }
             } else {
                 errorService = 'Invalid Service';
             }
 
             if (errorService) {
-                return res.status(500).json({ error: errorInvoice });
+                return res.status(500).json({ error: errorService });
             }
             //Tạo thực thể Invoice
             let total = calTotal(medicalServices, prescription);
-            console.log('This is MedicalServices', medicalServices);
-            console.log('Total', total);
+            let invoiceMedicines = prescription.map((medicine) => ({
+                name: medicine.name,
+                dosage: medicine.dosage,
+                quantity: medicine.quantity,
+                price: medicine.price,
+            }));
+
             let invoice = {
                 total: total,
-                medicines: prescription,
+                medicines: invoiceMedicines, // Sử dụng mảng vừa tạo
                 medicalServices: medicalServices,
                 patient: patientInfo._id,
             };
-            console.log('This is invoice', invoice);
+            const createdPrescription = await Prescription.create({
+                drugs: prescription,
+            });
             const createdInvoice = await Invoice.create(invoice);
-            console.log('This is invoice after created', createdInvoice);
             // Tạo lịch sử thăm khám và lưu vào cơ sở dữ liệu
             const history = {
                 ...req.body,
@@ -193,14 +233,75 @@ class HistoryController {
     }
 
     //[PUT] /history/:id   : Update an existing History
-    update(req, res, next) {
-        History.findByIdAndUpdate(req.params.id, req.body, { new: true })
-            .then((updatedData) => {
-                res.json(updatedData);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    async update(req, res, next) {
+        try {
+            let error = '';
+            const history = await History.findById(req.params.id);
+            if (!history) {
+                console.error('Không tìm thấy lịch sử khám bệnh');
+                return res
+                    .status(404)
+                    .json({ error: 'Không tìm thấy lịch sử khám bệnh' });
+            }
+            console.log('ok');
+            //Update Prescription
+            const prescriptionId = history.prescription;
+            const dataPrescription = await handleMedicines(
+                req.body.prescription,
+            );
+            let updatedPrescription = null;
+            if (dataPrescription.error === '') {
+                updatedPrescription = await Prescription.findByIdAndUpdate(
+                    prescriptionId,
+                    { drugs: dataPrescription.fixedPrescription },
+                    { new: true },
+                );
+            } else {
+                return res.status(500).json({ error: dataPrescription.error });
+            }
+
+            //Update Invoice
+            const invoiceId = history.invoice;
+            const drugs = updatedPrescription.drugs;
+            const dataServices = await handleServices(req.body.service);
+            let updatedServices = null;
+
+            if (dataServices.errorService === '') {
+                updatedServices = dataServices.medicalServices;
+            } else {
+                console.log(dataServices.errorService);
+                return res
+                    .status(500)
+                    .json({ error: dataServices.errorService });
+            }
+
+            let total = calTotal(updatedServices, drugs);
+            const updatedInvoice = await Invoice.findByIdAndUpdate(
+                invoiceId,
+                {
+                    medicalServices: updatedServices,
+                    medicines: drugs,
+                    total: total,
+                },
+                { new: true },
+            );
+
+            console.log('This is updated Invoice', updatedInvoice);
+
+            let historyData = req.body;
+            historyData.prescription = updatedPrescription._id;
+            historyData.invoice = updatedInvoice._id;
+            const updatedHistory = await History.findByIdAndUpdate(
+                historyData._id,
+                historyData,
+                { new: true },
+            );
+            console.log('This is updated history', updatedHistory);
+            res.status(200).json({ message: 'Cập nhật thành công' });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Đã xảy ra lỗi khi cập nhật' });
+        }
     }
 }
 

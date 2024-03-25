@@ -4,12 +4,9 @@ const ServiceSchema = new Schema({
     service: { type: mongoose.Schema.Types.ObjectId, ref: 'MedicalService' },
     name: { type: String },
     price: { type: Number },
-});
-const DrugSchema = new Schema({
-    medicine: { type: Schema.Types.ObjectId, ref: 'Medicine' },
-    dosage: { type: String },
     quantity: { type: Number },
 });
+
 const InvoiceSchema = new Schema(
     {
         patient: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -19,7 +16,7 @@ const InvoiceSchema = new Schema(
             paymentDate: Date,
         },
         medicalServices: [ServiceSchema],
-        medicines: [DrugSchema],
+        medicines: [],
         total: { type: Number },
         status: { type: String, default: 'pending' },
     },

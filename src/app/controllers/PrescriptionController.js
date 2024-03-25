@@ -93,7 +93,6 @@ class PrescriptionController {
         console.log(req.body);
         History.findByIdAndUpdate(req.params.id, req.body, { new: true })
             .then((updatedData) => {
-                console.log('This is updated data', updatedData);
                 res.json(updatedData);
             })
             .catch((err) => {
