@@ -5,6 +5,7 @@ const appointmentRouter = require('./appointment');
 const patientRouter = require('./patient');
 const historyRouter = require('./history');
 const prescriptionRouter = require('./prescription');
+const medicalRecordRouter = require('./medicalRecord');
 function route(app) {
     app.use('/posts', postsRouter);
     app.use('/profile', profileRouter);
@@ -13,5 +14,6 @@ function route(app) {
     app.use('/patient', patientRouter);
     app.use('/history', historyRouter);
     app.use('/prescription', prescriptionRouter);
+    app.use('/medicalRecord', medicalRecordRouter);
 }
 module.exports = route;

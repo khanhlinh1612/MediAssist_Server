@@ -23,6 +23,7 @@ const UserSchema = new Schema({
     specialist: { type: String, default: '' },
     // only Patient
     histories: [{ type: Schema.Types.ObjectId, ref: 'History' }],
+    medical_record: { type: Schema.Types.ObjectId, ref: 'MedicalRecord' },
 });
 UserSchema.plugin(uniqueValidator);
 const User = mongoose.model('User', UserSchema);

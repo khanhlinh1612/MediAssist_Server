@@ -2,14 +2,34 @@ const moment = require('moment');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const salt = bcrypt.genSaltSync(10);
+const MedicalRecord = require('../models/MedicalRecord');
+
+const createMedicalRecord = async (age, genderData) => {
+    try {
+        let gender = 0;
+        if (genderData === 'Nữ') {
+            gender = 0;
+        } else {
+            gender = 1;
+        }
+        const medicalRecord = await MedicalRecord.create({
+            age: age,
+            gender: gender,
+        });
+        return medicalRecord._id;
+    } catch (error) {
+        throw error;
+    }
+};
+
 const calculateAgeAndSeparateName = function ({ fullname, birthday }) {
     let first_name = '';
     let last_name = '';
     let age = '';
     if (fullname) {
         const names = fullname.split(' ');
-        first_name = names[0];
-        last_name = names[names.length - 1];
+        last_name = names[0];
+        first_name = names[names.length - 1];
     }
     if (birthday) {
         const today = new Date();
@@ -21,8 +41,15 @@ const calculateAgeAndSeparateName = function ({ fullname, birthday }) {
 class PatientController {
     // [GET] /patients : Get all patients
     async index(req, res, next) {
-        const patients = await User.find({ is_doctor: false });
-        res.json(patients);
+        try {
+            const patients = await User.find({ is_doctor: false }).sort({
+                first_name: 1,
+            });
+            res.json(patients);
+        } catch (error) {
+            console.error('Error fetching patients:', error);
+            res.status(500).json(error);
+        }
     }
     // [GET] /patients/:id : Get a patients
     async show(req, res, next) {
@@ -33,10 +60,13 @@ class PatientController {
     //[POST] /patients : Create a new appointment
     async create(req, res, next) {
         try {
-            console.log(req.body);
             const hashedPassword = bcrypt.hashSync(req.body.password, salt);
             const { first_name, last_name, age } = calculateAgeAndSeparateName(
                 req.body,
+            );
+            const medicalRecordId = await createMedicalRecord(
+                age,
+                req.body.gender,
             );
             const patient = {
                 fullname: req.body.fullname,
@@ -50,6 +80,7 @@ class PatientController {
                 last_name: last_name,
                 age: age,
                 is_doctor: false,
+                medical_record: medicalRecordId,
             };
             const response = await User.create(patient);
             res.json(response);
@@ -63,7 +94,6 @@ class PatientController {
     delete(req, res, next) {
         User.findByIdAndDelete(req.params.id)
             .then((response) => {
-                console.log(response);
                 res.json('success');
             })
             .catch((error) => {
@@ -84,13 +114,21 @@ class PatientController {
                 last_name,
                 age,
             };
-            console.log('This is data', data);
+
+            if (data.medical_record === undefined) {
+                const medicalRecordId = await createMedicalRecord(
+                    data.age,
+                    req.body.gender,
+                );
+                data.medical_record = medicalRecordId;
+            }
+
             const updatedData = await User.findOneAndUpdate(
                 { _id: req.params.id },
                 data,
                 { new: true },
             );
-
+            console.log('This is updated Data', updatedData);
             res.json(updatedData);
         } catch (error) {
             console.error('Error updating user:', error);

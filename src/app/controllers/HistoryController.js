@@ -243,7 +243,6 @@ class HistoryController {
                     .status(404)
                     .json({ error: 'Không tìm thấy lịch sử khám bệnh' });
             }
-            console.log('ok');
             //Update Prescription
             const prescriptionId = history.prescription;
             const dataPrescription = await handleMedicines(

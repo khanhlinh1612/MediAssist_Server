@@ -1,8 +1,5 @@
-const moment = require('moment');
 const History = require('../models/History');
 const User = require('../models/User');
-const Medicine = require('../models/Medicine');
-const MedicalService = require('../models/MedicalService');
 class PrescriptionController {
     // [GET] /history : Get all history
     async index(req, res, next) {
