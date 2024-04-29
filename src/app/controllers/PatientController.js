@@ -1,4 +1,3 @@
-const moment = require('moment');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const salt = bcrypt.genSaltSync(10);
@@ -88,6 +87,22 @@ class PatientController {
             console.error('Error creating event:', error);
             res.status(500).json(error);
         }
+    }
+
+    names(req, res, next) {
+        User.find({}, 'fullname phone_number') // Chỉ lấy trường fullname từ database
+            .then((patients) => {
+                const fullnames = patients.map((patient) => patient.fullname);
+                const phoneNumbers = patients.map((patient) => ({
+                    [patient.fullname]: patient.phone_number,
+                }));
+                console.log(phoneNumbers);
+                res.json({ fullnames, phoneNumbers }); // Trả về mảng các fullname
+            })
+            .catch((error) => {
+                console.error('Error fetching names:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            });
     }
 
     //[DELETE] /patients/:id : Delete

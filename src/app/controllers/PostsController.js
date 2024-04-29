@@ -1,4 +1,5 @@
 const Post = require('../models/Post');
+const Doctor = require('../models/Doctor');
 const fs = require('fs'); // import filesystem to rename files
 const jwt = require('jsonwebtoken');
 const secret = 'nvnit395nwvs9dtnet3925ascasl9';
@@ -95,9 +96,13 @@ class PostsController {
                 } else {
                     const { id, title, summary, content } = req.body;
                     const postDoc = await Post.findById(id);
+                    const doctorInfo = await Doctor.findOne({
+                        phone_number: userInfo.phone_number,
+                    });
                     const isAuthor =
-                        JSON.stringify(userInfo.id) ==
+                        JSON.stringify(doctorInfo._id) ==
                         JSON.stringify(postDoc.author);
+                    console.log(userInfo);
                     if (!isAuthor) {
                         return res
                             .status(400)

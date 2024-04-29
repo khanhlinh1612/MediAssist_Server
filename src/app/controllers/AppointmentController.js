@@ -37,7 +37,7 @@ class AppointmentController {
             //Xác thực số điện thoại bệnh nhân, lưu id bệnh nhân
             const phone_number = req.body.patientPhone;
             const patientInfo = await User.findOne({ phone_number });
-            if (!patientInfo || patientInfo.is_doctor) {
+            if (!patientInfo) {
                 return res.status(404).json({ error: 'Patient not found' });
             }
             // Tạo sự kiện và lưu vào cơ sở dữ liệu

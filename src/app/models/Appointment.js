@@ -9,7 +9,7 @@ const AppointmentSchema = new Schema(
         content: { type: String },
         patientName: { type: String },
         patientPhone: { type: String },
-        doctor: { type: Schema.Types.ObjectId, ref: 'User' },
+        doctor: { type: Schema.Types.ObjectId, ref: 'Doctor' },
         patient: { type: Schema.Types.ObjectId, ref: 'User' },
     },
     { timestamps: true },

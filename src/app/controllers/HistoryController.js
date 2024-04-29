@@ -94,7 +94,12 @@ class HistoryController {
         if (historyId) {
             History.findById(historyId)
                 .populate('prescription', ['drugs'])
-                .populate('invoice', ['medicalServices', 'medicines'])
+                .populate('invoice', [
+                    'medicalServices',
+                    'medicines',
+                    'total',
+                    'status',
+                ])
                 .then((data) => {
                     if (data) {
                         res.json(data);
@@ -224,7 +229,6 @@ class HistoryController {
         History.findByIdAndDelete(req.params.id)
             .then((response) => {
                 res.json('success');
-                // res.json(response);
             })
             .catch((error) => {
                 console.error('Error creating event:', error);

@@ -1,6 +1,4 @@
 const Doctor = require('../models/Doctor');
-const User = require('../models/User');
-const History = require('../models/History');
 const bcrypt = require('bcrypt');
 const salt = bcrypt.genSaltSync(10);
 const jwt = require('jsonwebtoken');
@@ -10,13 +8,13 @@ class SiteController {
     async register(req, res) {
         const { phone_number, password } = req.body;
         const hashedPassword = bcrypt.hashSync(password, salt);
-        // Tạo một user mới với thông tin đã băm mật khẩu
+        // Tạo một Doctor mới với thông tin đã băm mật khẩu
         Doctor.create({
             phone_number,
             password: hashedPassword, // Sử dụng mật khẩu đã băm
         })
-            .then((user) => {
-                return res.json(user);
+            .then((Doctor) => {
+                return res.json(Doctor);
             })
             .catch((err) => {
                 console.error(err);
@@ -28,14 +26,16 @@ class SiteController {
     async login(req, res) {
         try {
             const { phone_number, password } = req.body;
-            const userDoc = await Doctor.findOne({ phone_number });
-            console.log('Đây là userDoc', userDoc);
-            if (userDoc !== null) {
-                const passOk = await bcrypt.compare(password, userDoc.password);
+            const DoctorDoc = await Doctor.findOne({ phone_number });
+            if (DoctorDoc !== null) {
+                const passOk = await bcrypt.compare(
+                    password,
+                    DoctorDoc.password,
+                );
                 if (passOk) {
                     //logged in
                     jwt.sign(
-                        { phone_number, id: userDoc.id },
+                        { phone_number, id: DoctorDoc.id },
                         secret,
                         {},
                         (err, token) => {
@@ -47,10 +47,10 @@ class SiteController {
                             }
 
                             return res.cookie('token', token).json({
-                                id: userDoc.id,
-                                first_name: userDoc.first_name,
-                                last_name: userDoc.last_name,
-                                avatar: userDoc.avatar,
+                                id: DoctorDoc.id,
+                                first_name: DoctorDoc.first_name,
+                                last_name: DoctorDoc.last_name,
+                                avatar: DoctorDoc.avatar,
                             });
                         },
                     );
@@ -69,23 +69,16 @@ class SiteController {
         return res.cookie('token', '').json('ok');
     }
 
-    //[GET] /totalCount
-    async totalCount(req, res) {
-        try {
-            const totalUsers = await User.countDocuments();
-            const totalHistories = await History.countDocuments();
-            const totalIsHeartAttacked = await User.countDocuments({
-                is_heart_attack: true,
+    // [GET] /doctor/:id : Get a doctor
+    show(req, res) {
+        Doctor.find({ id: req.params.id })
+            .then((Doctor) => {
+                res.json(Doctor);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).json({ error: 'Internal Server Error' });
             });
-            return res.json({
-                totalUsers,
-                totalHistories,
-                totalIsHeartAttacked,
-            });
-        } catch (err) {
-            console.error('Error calculating total count:', err);
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
     }
 }
 module.exports = new SiteController();

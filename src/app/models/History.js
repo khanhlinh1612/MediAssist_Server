@@ -12,7 +12,7 @@ const HistorySchema = new Schema(
         reExamDate: { type: Date },
         prescription: { type: Schema.Types.ObjectId, ref: 'Prescription' },
         invoice: { type: Schema.Types.ObjectId, ref: 'Invoice' },
-        doctor: { type: Schema.Types.ObjectId, ref: 'User' },
+        doctor: { type: Schema.Types.ObjectId, ref: 'Doctor' },
         patient: { type: Schema.Types.ObjectId, ref: 'User' },
     },
     { timestamps: true },
