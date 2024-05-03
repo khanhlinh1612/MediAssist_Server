@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const historyController = require('../app/controllers/HistoryController');
+router.get('/services', historyController.services);
+router.get('/drugs', historyController.drugs);
 router.get('/:id', historyController.show);
 router.put('/:id', historyController.update);
 router.delete('/:id', historyController.delete);

@@ -18,7 +18,7 @@ const InvoiceSchema = new Schema(
         medicalServices: [ServiceSchema],
         medicines: [],
         total: { type: Number },
-        status: { type: String, default: 'pending' },
+        status: { type: String, default: 'unpaid' },
     },
     { timestamps: true },
 );

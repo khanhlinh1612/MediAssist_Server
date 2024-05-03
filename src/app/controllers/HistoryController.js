@@ -236,6 +236,34 @@ class HistoryController {
             });
     }
 
+    async services(req, res) {
+        MedicalService.find({}, 'name')
+            .then((services) => {
+                const serviceNames = services.map((service) => service.name);
+                console.log(serviceNames);
+                res.json(serviceNames);
+            })
+            .catch((error) => {
+                console.error('Error fetching names:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            });
+    }
+
+    async drugs(req, res) {
+        Medicine.find({}, 'name')
+            .then((medicines) => {
+                const medicineNames = medicines.map(
+                    (medicine) => medicine.name,
+                );
+                console.log(medicineNames);
+                res.json(medicineNames);
+            })
+            .catch((error) => {
+                console.error('Error fetching names:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            });
+    }
+
     //[PUT] /history/:id   : Update an existing History
     async update(req, res, next) {
         try {
