@@ -78,6 +78,12 @@ class HistoryController {
                 });
         } else {
             History.find()
+                .populate('invoice', [
+                    'medicalServices',
+                    'medicines',
+                    'total',
+                    'status',
+                ])
                 .sort({ createdAt: 'desc' })
                 .then((histories) => {
                     res.json(histories);
@@ -187,12 +193,13 @@ class HistoryController {
                 quantity: medicine.quantity,
                 price: medicine.price,
             }));
-
+            let status = total > 0 ? 'unpaid' : 'paid';
             let invoice = {
                 total: total,
                 medicines: invoiceMedicines, // Sử dụng mảng vừa tạo
                 medicalServices: medicalServices,
                 patient: patientInfo._id,
+                status: status,
             };
             const createdPrescription = await Prescription.create({
                 drugs: prescription,

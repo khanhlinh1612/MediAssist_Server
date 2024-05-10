@@ -78,17 +78,13 @@ class ProfileController {
                 console.error('Error updating Doctor:', err.code);
                 if (err.code === 11000) {
                     if (err.keyPattern.phone_number) {
-                        return res
-                            .status(500)
-                            .json({
-                                error: `Số điện thoại đã tồn tại trong hệ thống.`,
-                            });
+                        return res.status(500).json({
+                            error: `Số điện thoại đã tồn tại trong hệ thống.`,
+                        });
                     } else if (err.keyPattern.idNumber) {
-                        return res
-                            .status(500)
-                            .json({
-                                error: `Số căn cước công dân đã tồn tại trong hệ thống.`,
-                            });
+                        return res.status(500).json({
+                            error: `Số căn cước công dân đã tồn tại trong hệ thống.`,
+                        });
                     }
                 } else
                     return res

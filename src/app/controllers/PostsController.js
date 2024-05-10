@@ -15,7 +15,6 @@ class PostsController {
             .sort({ createdAt: 'desc' })
             .limit(10)
             .then((posts) => {
-                posts = multipleMongooseObjectHandlers(posts);
                 res.json(posts);
             })
             .catch((err) => {
@@ -25,7 +24,7 @@ class PostsController {
     }
 
     // [POST] /posts : create a new post
-    create(req, res, next) {
+    async create(req, res, next) {
         const { originalname, path } = req.file;
         const parts = originalname.split('.');
         const ext = parts[parts.length - 1];
@@ -35,19 +34,23 @@ class PostsController {
         // Get ID of author
         const { token } = req.cookies;
         var user_id = '';
+        console.log('This is token', token);
         if (token !== undefined && token !== '') {
-            jwt.verify(token, secret, {}, (err, info) => {
+            await jwt.verify(token, secret, {}, async (err, info) => {
+                console.log('This is info', info);
                 if (err) {
                     console.error('Error verifying token:', err);
                     return res.status(401).json({ error: 'Unauthorized' });
                 } else {
-                    user_id = info.id;
+                    let infoAuthor = await Doctor.findOne({
+                        phone_number: info.phone_number,
+                    });
+                    console.log('Uar', infoAuthor);
+                    user_id = infoAuthor._id;
                 }
             });
         }
-
         const { title, summary, content } = req.body;
-
         Post.create({
             title,
             summary,
