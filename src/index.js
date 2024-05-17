@@ -8,9 +8,9 @@ const route = require('./routes');
 const db = require('./config');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const port = 4000;
+const port = process.env.PORT || 4000;
 const corsOptions = {
-    origin: 'http://localhost:3000', // Thay đổi thành nguồn gốc của ứng dụng frontend của bạn
+    origin: ['https://medi-assist-eight.vercel.app', 'http://localhost:3000'], // Thay đổi thành nguồn gốc của ứng dụng frontend của bạn
     credentials: true, // Cho phép sử dụng cookie và xác thực HTTP
 };
 
