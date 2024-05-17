@@ -147,7 +147,7 @@ class PatientController {
             res.json(updatedData);
         } catch (error) {
             console.error('Error updating user:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.status(500).json(error);
         }
     }
 }

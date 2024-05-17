@@ -7,5 +7,4 @@ router.put('/:id', patientController.update);
 router.delete('/:id', patientController.delete);
 router.get('/', patientController.index);
 router.post('/', patientController.create);
-router.get('/names', patientController.names);
 module.exports = router;

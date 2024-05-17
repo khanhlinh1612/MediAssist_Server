@@ -25,46 +25,62 @@ class PostsController {
 
     // [POST] /posts : create a new post
     async create(req, res, next) {
-        const { originalname, path } = req.file;
-        const parts = originalname.split('.');
-        const ext = parts[parts.length - 1];
-        const newpath = path + '.' + ext;
-        fs.renameSync(path, newpath);
+        try {
+            // Rename the uploaded file
+            const { originalname, path } = req.file;
+            const parts = originalname.split('.');
+            const ext = parts[parts.length - 1];
+            const newpath = `${path}.${ext}`;
+            fs.renameSync(path, newpath);
 
-        // Get ID of author
-        const { token } = req.cookies;
-        var user_id = '';
-        console.log('This is token', token);
-        if (token !== undefined && token !== '') {
-            await jwt.verify(token, secret, {}, async (err, info) => {
-                console.log('This is info', info);
-                if (err) {
-                    console.error('Error verifying token:', err);
-                    return res.status(401).json({ error: 'Unauthorized' });
-                } else {
-                    let infoAuthor = await Doctor.findOne({
+            // Get ID of author from token
+            const { token } = req.cookies;
+            let user_id = '';
+
+            console.log('This is token', token);
+            if (token) {
+                try {
+                    const info = await jwt.verify(token, secret);
+                    console.log('This is info', info);
+
+                    const infoAuthor = await Doctor.findOne({
                         phone_number: info.phone_number,
                     });
-                    console.log('Uar', infoAuthor);
+
+                    if (!infoAuthor) {
+                        return res.status(401).json({ error: 'Unauthorized' });
+                    }
+
+                    console.log('User', infoAuthor);
                     user_id = infoAuthor._id;
+                } catch (err) {
+                    console.error('Error verifying token:', err);
+                    return res.status(401).json({ error: 'Unauthorized' });
                 }
+            } else {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            // Ensure user_id is valid ObjectId
+            if (!mongoose.Types.ObjectId.isValid(user_id)) {
+                return res.status(400).json({ error: 'Invalid user ID' });
+            }
+
+            // Create the post
+            const { title, summary, content } = req.body;
+            const postDoc = await Post.create({
+                title,
+                summary,
+                cover: newpath,
+                content,
+                author: user_id,
             });
+
+            res.json(postDoc);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
-        const { title, summary, content } = req.body;
-        Post.create({
-            title,
-            summary,
-            cover: newpath,
-            content,
-            author: user_id,
-        })
-            .then((postDoc) => {
-                res.json(postDoc);
-            })
-            .catch((err) => {
-                console.error(err);
-                res.status(500).json({ error: 'Internal Server Error' });
-            });
     }
 
     //  [GET] /posts/:id :get a specific post
@@ -125,7 +141,20 @@ class PostsController {
 
     // [DELETE] /posts/:slug :delete a specific post
     delete(req, res, next) {
-        return res.json('deleted');
+        const postId = req.params.id; // Extract the post ID from request parameters
+        Post.findByIdAndDelete(postId) // Find and delete the post by its ID
+            .then((deletedPost) => {
+                if (!deletedPost) {
+                    // If no post is found with the provided ID
+                    return res.status(404).json({ error: 'Post not found' });
+                }
+                // If the post is successfully deleted
+                res.json({ message: 'Post deleted successfully' });
+            })
+            .catch((error) => {
+                console.error('Error deleting post:', error);
+                res.status(500).json({ error: 'Internal Server Error' }); // Handle other errors
+            });
     }
 }
 
