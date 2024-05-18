@@ -5,7 +5,10 @@ async function connect() {
         const password = '0JD7yYqq0gpNN8Ju';
         const uri = `mongodb+srv://linhpham1612:${password}@cluster0.hp2ppcy.mongodb.net/MediAssist?retryWrites=true&w=majority&appName=Cluster0`;
 
-        await mongoose.connect(uri);
+        await mongoose.connect(uri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
 
         console.log('Successfully connected to MongoDB server');
     } catch (error) {
