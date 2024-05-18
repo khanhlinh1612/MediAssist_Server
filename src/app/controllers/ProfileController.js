@@ -6,6 +6,7 @@ class ProfileController {
     //[GET] /profile
     show(req, res) {
         const { token } = req.cookies;
+        console.log('Day laf token', token);
         if (token !== undefined && token !== '') {
             jwt.verify(token, secret, {}, (err, info) => {
                 if (err) {

@@ -46,12 +46,19 @@ class SiteController {
                                     .json({ error: 'Internal Server Error' });
                             }
 
-                            return res.cookie('token', token).json({
-                                id: userDoc.id,
-                                first_name: userDoc.first_name,
-                                last_name: userDoc.last_name,
-                                avatar: userDoc.avatar,
-                            });
+                            return res
+                                .cookie('token', token, {
+                                    httpOnly: true,
+                                    expires: new Date(Date.now() + 900000),
+                                    sameSite: 'none',
+                                    secure: true,
+                                })
+                                .json({
+                                    id: userDoc.id,
+                                    first_name: userDoc.first_name,
+                                    last_name: userDoc.last_name,
+                                    avatar: userDoc.avatar,
+                                });
                         },
                     );
                 } else {
