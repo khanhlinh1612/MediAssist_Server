@@ -6,7 +6,8 @@ const MedicalService = require('../models/MedicalService');
 const Prescription = require('../models/Prescription');
 const Invoice = require('../models/Invoice');
 const jwt = require('jsonwebtoken');
-const secret = 'nvnit395nwvs9dtnet3925ascasl9';
+require('dotenv').config();
+const secret = process.env.JWT_SECRET;
 const calTotal = (serviceArray, medicineArray) => {
     let total = 0;
     serviceArray.forEach((service) => {

@@ -7,11 +7,15 @@ const route = require('./routes');
 const db = require('./config');
 const cors = require('cors');
 const session = require('express-session');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
+require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const port = process.env.PORT || 4000;
 const corsOptions = {
-    origin: ['https://medi-assist-eight.vercel.app', 'http://localhost:3000'],
+    origin: [
+        'https://medi-assist-eight.vercel.app',
+        'http://localhost:3000',
+        'https://medi-assist-9k2wvtetl-khanhlinh1311s-projects.vercel.app',
+    ],
     credentials: true,
     exposedHeaders: ['set-cookie'],
 };
@@ -21,22 +25,6 @@ app.set('trust proxy', 1);
 app.enable('trust proxy');
 // Connect to DB
 db.connect();
-
-// Configure session middleware
-app.use(
-    session({
-        secret: 'your_secret_key', // Replace with your actual secret key
-        //   store: new SequelizeStore({
-        //     db: db.sequelize,
-        //     checkExpirationInterval: 15 * 60 * 1000,
-        //     expiration: 15 * 24 * 60 * 60 * 1000,
-        //   }),
-        resave: false,
-        proxy: true,
-        saveUninitialized: true,
-        cookie: { secure: true, sameSite: 'none' }, // Secure cookie settings
-    }),
-);
 
 app.use(cors(corsOptions));
 app.use(cookieParser());

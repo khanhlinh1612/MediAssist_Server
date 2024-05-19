@@ -2,7 +2,8 @@ const moment = require('moment');
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const secret = 'nvnit395nwvs9dtnet3925ascasl9';
+require('dotenv').config();
+const secret = process.env.JWT_SECRET;
 class AppointmentController {
     // [GET] /appointments : Get all appointments
     async index(req, res, next) {

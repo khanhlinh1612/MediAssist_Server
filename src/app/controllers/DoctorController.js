@@ -2,8 +2,8 @@ const Doctor = require('../models/Doctor');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const salt = bcrypt.genSaltSync(10);
-const secret = 'nvnit395nwvs9dtnet3925ascasl9';
-
+require('dotenv').config();
+const secret = process.env.JWT_SECRET;
 class SiteController {
     //[POST] /register
     async register(req, res) {

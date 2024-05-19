@@ -1,43 +1,51 @@
 const Doctor = require('../models/Doctor');
 const jwt = require('jsonwebtoken');
-const secret = 'nvnit395nwvs9dtnet3925ascasl9';
+require('dotenv').config();
+const secret = process.env.JWT_SECRET;
 const fs = require('fs');
 class ProfileController {
     //[GET] /profile
-    show(req, res) {
-        const { token } = req.cookies;
-        console.log('Day laf token', token);
-        if (token !== undefined && token !== '') {
-            jwt.verify(token, secret, {}, (err, info) => {
-                if (err) {
-                    console.error('Error verifying token:', err);
-                    return res.status(401).json({ error: 'Unauthorized' });
-                } else {
-                    const { phone_number } = info;
-                    Doctor.findOne({ phone_number })
-                        .then((Doctor) => {
-                            if (!Doctor) {
-                                return res
-                                    .status(404)
-                                    .json({ error: 'Doctor not found' });
-                            }
+    show = (req, res) => {
+        // const authHeader = req.headers['authorization'];
+        // if (!authHeader) {
+        //     return res.status(400).json({ error: 'No token provided' });
+        // }
 
-                            return res.json({ Doctor, status: 'valid' });
-                        })
-                        .catch((err) => {
-                            console.error('Error finding Doctor:', err);
-                            return res
-                                .status(500)
-                                .json({ error: 'Internal Server Error' });
-                        });
+        // const token = authHeader.split(' ')[1];
+        const { token } = req.cookies;
+        console.log('Đây là token:', token);
+
+        if (token) {
+            jwt.verify(token, secret, (err, info) => {
+                if (err) {
+                    console.error('Lỗi xác thực token:', err);
+                    return res.status(401).json({ error: 'Unauthorized' });
                 }
+
+                const { phone_number } = info;
+                Doctor.findOne({ phone_number })
+                    .then((doctor) => {
+                        if (!doctor) {
+                            return res
+                                .status(404)
+                                .json({ error: 'Doctor not found' });
+                        }
+
+                        return res.json({ Doctor: doctor, status: 'valid' });
+                    })
+                    .catch((err) => {
+                        console.error('Lỗi tìm kiếm Doctor:', err);
+                        return res
+                            .status(500)
+                            .json({ error: 'Internal Server Error' });
+                    });
             });
         } else {
-            return res.json({
-                status: 'invalid',
-            });
+            return res
+                .status(400)
+                .json({ status: 'invalid', error: 'Invalid token' });
         }
-    }
+    };
 
     //[PUT] /profile/:id
     async update(req, res) {

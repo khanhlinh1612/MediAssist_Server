@@ -4,7 +4,8 @@ const History = require('../models/History');
 const bcrypt = require('bcrypt');
 const salt = bcrypt.genSaltSync(10);
 const jwt = require('jsonwebtoken');
-const secret = 'nvnit395nwvs9dtnet3925ascasl9';
+require('dotenv').config();
+const secret = process.env.JWT_SECRET;
 class SiteController {
     //[POST] /register
     async register(req, res) {
@@ -32,6 +33,7 @@ class SiteController {
             console.log('Đây là userDoc', userDoc);
             if (userDoc !== null) {
                 const passOk = await bcrypt.compare(password, userDoc.password);
+                console.log('This is secret', secret);
                 if (passOk) {
                     //logged in
                     jwt.sign(
