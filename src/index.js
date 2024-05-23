@@ -6,16 +6,11 @@ const app = express();
 const route = require('./routes');
 const db = require('./config');
 const cors = require('cors');
-const session = require('express-session');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const port = process.env.PORT || 4000;
 const corsOptions = {
-    origin: [
-        'https://medi-assist-eight.vercel.app',
-        'http://localhost:3000',
-        'https://medi-assist-9k2wvtetl-khanhlinh1311s-projects.vercel.app',
-    ],
+    origin: ['https://medi-assist-system.vercel.app', 'http://localhost:3000'],
     credentials: true,
     exposedHeaders: ['set-cookie'],
 };
