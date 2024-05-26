@@ -28,64 +28,6 @@ class SiteController {
         }
     }
 
-    //[POST] /login
-    // async login(req, res) {
-    //     try {
-    //         const { phone_number, password } = req.body;
-    //         if (!phone_number || !password) {
-    //             return res.status(400).json({ error: 'Phone number and password are required' });
-    //         }
-
-    //         const DoctorDoc = await Doctor.findOne({ phone_number });
-    //         if (DoctorDoc) {
-    //             const passOk = await bcrypt.compare(password, DoctorDoc.password);
-    //             if (passOk) {
-    //                 //logged in
-    //                 jwt.sign(
-    //                     { phone_number, id: DoctorDoc._id },
-    //                     secret,
-    //                     {},
-    //                     (err, token) => {
-    //                         if (err) {
-    //                             console.error('Error generating token:', err);
-    //                             return res.status(500).json({ error: 'Internal Server Error' });
-    //                         }
-
-    //                         Routes.json(
-    //                             {
-    //                                 userInfo: {
-    //                                     id: DoctorDoc._id,
-    //                                     first_name: DoctorDoc.first_name,
-    //                                     last_name: DoctorDoc.last_name,
-    //                                     avatar: DoctorDoc.avatar,
-    //                                     },
-    //                                 token: token,
-    //                             }
-
-    //                     );
-    //                     }
-    //                 );
-    //             } else {
-    //                 res.status(401).json({ error: 'Invalid credentials' });
-    //             }
-    //         } else {
-    //             res.status(400).json({ error: 'Invalid credentials' });
-    //         }
-    //     } catch (err) {
-    //         console.error('Login error: ' + err.message);
-    //         res.status(500).json({ error: 'Internal Server Error' });
-    //     }
-    // }
-
-    //[POST] /logout
-    logout(req, res) {
-        res.cookie('token', '', {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-        }).json('ok');
-    }
-
     // [GET] /doctor/:id : Get a doctor
     async show(req, res) {
         try {

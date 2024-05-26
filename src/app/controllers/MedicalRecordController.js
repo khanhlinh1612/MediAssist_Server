@@ -1,5 +1,5 @@
 const MedicalRecord = require('../models/MedicalRecord');
-
+const User = require('../models/User');
 class MedicalRecordController {
     // [GET] /posts : Get all posts
     index(req, res) {
@@ -22,6 +22,10 @@ class MedicalRecordController {
 
     //  [GET] /posts/:id :get a specific post
     show(req, res, next) {
+        console.log(
+            "There's an api from client to get Medical Record",
+            req.params.id,
+        );
         MedicalRecord.findById(req.params.id)
             .then((record) => {
                 res.json(record);
@@ -35,12 +39,29 @@ class MedicalRecordController {
     async update(req, res, next) {
         try {
             let data = req.body;
-            for (let key in data) {
-                if (!isNaN(parseFloat(data[key]))) {
-                    data[key] = parseFloat(data[key]);
+            if (data.result !== 2) {
+                const is_heart_attack = data.result === 1;
+                console.log('This is heart_attack', is_heart_attack);
+                try {
+                    const record = await User.find({
+                        medical_record: req.params.id,
+                    });
+                    if (record.length > 0) {
+                        console.log(
+                            'This is heart_attacdádssk',
+                            is_heart_attack,
+                        );
+                        await User.findOneAndUpdate(
+                            { _id: record[0]._id },
+                            { is_heart_attack: is_heart_attack },
+                        );
+                    }
+                } catch (error) {
+                    console.error('Error updating patient record:', error);
+                    // Xử lý lỗi hoặc thông báo cho người dùng
                 }
             }
-            console.log(data);
+
             const updatedMedicalRecord = await MedicalRecord.findOneAndUpdate(
                 { _id: req.params.id },
                 data,

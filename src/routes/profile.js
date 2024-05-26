@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const parser = require('../util/parser');
 const profileController = require('../app/controllers/ProfileController');
 const multer = require('multer');
-const uploadMiddleware = multer({ dest: 'uploads/' });
 router.get('/', profileController.show);
-router.put('/:id', uploadMiddleware.single('file'), profileController.update);
+router.put('/:id', parser.single('file'), profileController.update);
 module.exports = router;

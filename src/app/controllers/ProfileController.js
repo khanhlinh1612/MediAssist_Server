@@ -6,12 +6,6 @@ const fs = require('fs');
 class ProfileController {
     //[GET] /profile
     show = (req, res) => {
-        // const authHeader = req.headers['authorization'];
-        // if (!authHeader) {
-        //     return res.status(400).json({ error: 'No token provided' });
-        // }
-
-        // const token = authHeader.split(' ')[1];
         const { token } = req.cookies;
         console.log('Đây là token:', token);
 
@@ -54,19 +48,11 @@ class ProfileController {
         if (!id) {
             return res.status(400).json({ error: 'Doctor ID is required' });
         }
-
-        let newPath = null;
-        if (req.file) {
-            const { originalname, path } = req.file;
-            const parts = originalname.split('.');
-            const ext = parts[parts.length - 1];
-            newPath = path + '.' + ext;
-            fs.renameSync(path, newPath);
-        }
+        const avatar = req.file.path;
 
         const currentDoctor = await Doctor.findOne({ _id: id });
         const updatedDoctor = req.body;
-        updatedDoctor.avatar = newPath ? newPath : currentDoctor.avatar;
+        updatedDoctor.avatar = avatar ? avatar : currentDoctor.avatar;
         updatedDoctor.password = currentDoctor.password;
         console.log('This is updatedDoctor', updatedDoctor);
         Doctor.findByIdAndUpdate(id, updatedDoctor, { new: true })

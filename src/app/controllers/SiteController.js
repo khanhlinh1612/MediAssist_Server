@@ -51,7 +51,7 @@ class SiteController {
                             return res
                                 .cookie('token', token, {
                                     httpOnly: true,
-                                    expires: new Date(Date.now() + 900000),
+                                    expires: new Date(Date.now() + 1800000),
                                     sameSite: 'none',
                                     secure: true,
                                 })
