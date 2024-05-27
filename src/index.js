@@ -35,7 +35,6 @@ app.use(
 );
 //Config Static File
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, '..', '/uploads')));
 
 //Process data from the submitted form
 app.use(
